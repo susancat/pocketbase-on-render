@@ -1,21 +1,16 @@
-FROM golang:1.21-alpine
+FROM alpine:latest
 
-# Install Git
-RUN apk add --no-cache git
+# 安裝必要套件
+RUN apk add --no-cache ca-certificates
 
-# Set working directory
+# 設定工作目錄
 WORKDIR /app
 
-# Clone the latest PocketBase release
-RUN git clone https://github.com/pocketbase/pocketbase.git . \
-  && go mod tidy
+# 複製 PocketBase 可執行檔到容器中
+COPY pocketbase /app/pocketbase
 
-# Build
-RUN go build -o pocketbase
-
-# Start script
-COPY start.sh .
-
+# 開放預設埠口
 EXPOSE 8090
 
-CMD ["./start.sh"]
+# 啟動 PocketBase
+CMD ["./pocketbase", "serve", "--http=0.0.0.0:8090"]
